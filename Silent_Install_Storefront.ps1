@@ -494,9 +494,19 @@ var servername = req.getResponseHeader('SF-ServerName');
     $FooterJavaScript | Out-File -FilePath "C:\inetpub\wwwroot\Citrix\StoreWeb\custom\script.js" -Append -Encoding ascii
 }
 
-# Set Default Web Page Redirect#==============================Write-Host -ForegroundColor Yellow "$((Get-Date).ToLongTimeString()) : Set Default Web Page Redirect to StoreWeb"#.\appcmd set config /section:httpRedirect /enabled:true /destination:"$HostBaseURL$receiverVirtualPath" /childOnly:true /exactDestination:false /httpResponseStatus:Permanent#.\appcmd set site "Default Web Site" /section:httpRedirect /enabled:true /destination:"$HostBaseURL$receiverVirtualPath" /childOnly:true /exactDestination:false /httpResponseStatus:Permanent. $env:SystemRoot\System32\inetsrv\appcmd.exe set config "Default Web Site" /section:httpRedirect /enabled:true /destination:"$HostBaseURL$receiverVirtualPath" /childOnly:true /exactDestination:false /httpResponseStatus:Permanentif ($RequestWebCertificate) {    #requests and installs the certificate    $cert = Get-Certificate -URL "ldap:///CN=2019CA" -Template $WebServerTemplate -CertStoreLocation Cert:\LocalMachine\My -DnsName $HostBaseURL.Replace("https://","").Replace("http://",""),"$($env:computername).$($env:USERDNSDOMAIN)"
+# Set Default Web Page Redirect
+#==============================
+Write-Host -ForegroundColor Yellow "$((Get-Date).ToLongTimeString()) : Set Default Web Page Redirect to StoreWeb"
+#.\appcmd set config /section:httpRedirect /enabled:true /destination:"$HostBaseURL$receiverVirtualPath" /childOnly:true /exactDestination:false /httpResponseStatus:Permanent
+#.\appcmd set site "Default Web Site" /section:httpRedirect /enabled:true /destination:"$HostBaseURL$receiverVirtualPath" /childOnly:true /exactDestination:false /httpResponseStatus:Permanent
+. $env:SystemRoot\System32\inetsrv\appcmd.exe set config "Default Web Site" /section:httpRedirect /enabled:true /destination:"$HostBaseURL$receiverVirtualPath" /childOnly:true /exactDestination:false /httpResponseStatus:Permanent
+
+if ($RequestWebCertificate) {
+    #requests and installs the certificate
+    $cert = Get-Certificate -URL "ldap:///CN=2019CA" -Template $WebServerTemplate -CertStoreLocation Cert:\LocalMachine\My -DnsName $HostBaseURL.Replace("https://","").Replace("http://",""),"$($env:computername).$($env:USERDNSDOMAIN)"
     Write-Host "Certificate was: " -NoNewline
     $cert.Status
+
 
     Write-Host "Binding Certificate to 443" -NoNewline
     New-WebBinding -Name "Default Web Site" -IP "*" -Port 443 -Protocol https
